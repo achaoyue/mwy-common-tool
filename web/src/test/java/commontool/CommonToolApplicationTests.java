@@ -1,4 +1,4 @@
-package com.mwy.commontool;
+package commontool;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
