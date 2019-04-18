@@ -130,16 +130,16 @@ public class ClassInfoUtil {
         ClassContext.getInstance().put(className,classInfo);
         List<MethodInfo> methodInfos = classInfo.getMethodInfos();
         Set<MethodInfo> set = new HashSet<>();
-        for (MethodInfo method : methodInfos) {
-            set.add(method);
-            method.setNextCalls(getMethod(method,fun,implFun,set));
-            set.remove(method);
-        }
+        methodInfos.stream().flatMap(e->e.getNextCalls().stream()).forEach(e->{
+            set.add(e);
+            e.setNextCalls(getMethod(e,fun,implFun,set));
+            set.remove(e);
+        });
         return methodInfos;
     }
     public static List<MethodInfo> getMethodChain(String className,Function<String, Boolean> fun) throws Exception {
         return getMethodChain(className,fun,e->{
-            String[] split = e.split(".");
+            String[] split = e.split("\\.");
             split[split.length-2] = split[split.length-2] + ".impl";
             return String.join(".",split) + "Impl";
         });
@@ -166,7 +166,7 @@ public class ClassInfoUtil {
         }
 
         MethodInfo resultMethod = classInfo.getMethodInfos().stream().filter(e -> {
-            return e.getClassName().equals(methodInfo.getClassName()) && e.getMethodName().equals(methodInfo.getMethodName()) && e.getArguments().equals(methodInfo.getArguments());
+            return  e.getMethodName().equals(methodInfo.getMethodName()) && e.getArguments().equals(methodInfo.getArguments());
         }).findAny().orElse(null);
         if(resultMethod == null || resultMethod.getNextCalls() == null){
             return null;
