@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ClassContext {
-    Map<String,ClassInfo> classInfoMap = new HashMap<>();
+    private Map<String,ClassInfo> classInfoMap = new HashMap<>();
 
     private ClassContext() {
     }
@@ -21,5 +21,9 @@ public class ClassContext {
 
     protected void put(String className,ClassInfo classInfo){
         classInfoMap.put(className,classInfo);
+    }
+
+    protected boolean containsKey(String key){
+        return  classInfoMap.containsKey(key);
     }
 }

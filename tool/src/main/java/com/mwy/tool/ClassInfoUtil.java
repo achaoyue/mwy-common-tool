@@ -157,11 +157,16 @@ public class ClassInfoUtil {
         ClassInfo classInfo = null;
         try {
             classInfo = ClassContext.getInstance().get(className);
+            if(classInfo == null && ClassContext.getInstance().containsKey(className)){
+                return null;
+            }
             if(classInfo == null){
                 classInfo = parseClass(className, fun);
                 ClassContext.getInstance().put(className,classInfo);
             }
         } catch (Exception e) {
+            System.out.println("未找到："+methodInfo.getClassName());
+            ClassContext.getInstance().put(className,null);
             return null;
         }
 
@@ -172,7 +177,8 @@ public class ClassInfoUtil {
             return null;
         }
 
-        if(set.contains(resultMethod)){//发现递归了
+        //发现递归了
+        if(set.contains(resultMethod)){
             return resultMethod.getNextCalls();
         }
 
