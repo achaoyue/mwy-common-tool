@@ -8,6 +8,9 @@
     <groupId>com.mwy</groupId>
     <artifactId>tool</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <properties>
+        <spring.version>4.3.18.RELEASE</spring.version>
+    </properties>
     <build>
         <plugins>
             <plugin>
@@ -44,19 +47,19 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
-                <version>4.3.2.RELEASE</version>
+                <version>${spring.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>4.3.2.RELEASE</version>
+                <version>${spring.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>4.3.2.RELEASE</version>
+                <version>${spring.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.aspectj</groupId>
@@ -67,7 +70,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-tx</artifactId>
-                <version>4.3.2.RELEASE</version>
+                <version>${spring.version}</version>
                 <scope>compile</scope>
             </dependency>
 
