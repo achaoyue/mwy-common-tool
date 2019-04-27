@@ -2,6 +2,7 @@ package com.mwy.tool;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ClassContext {
     private Map<String,ClassInfo> classInfoMap = new HashMap<>();
@@ -25,5 +26,9 @@ public class ClassContext {
 
     protected boolean containsKey(String key){
         return  classInfoMap.containsKey(key);
+    }
+
+    public Set<String> keySet(){
+        return classInfoMap.keySet();
     }
 }

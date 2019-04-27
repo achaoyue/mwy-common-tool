@@ -15,17 +15,38 @@ import java.util.function.Function;
 public class ClassInfoUtil {
     public static final String INTERFACE = "I";
 
+    /**
+     * 解析摸个class文件
+     * @param file class文件
+     * @param fun 当前调用方法是否需要统计
+     * @return
+     * @throws Exception
+     */
     public static ClassInfo parseClass(String file, Function<String, Boolean> fun) throws Exception {
         String[] split = file.split("\\.");
         return parseClass(ClassInfoUtil.class.getResourceAsStream("/" + file.replace(".", "/") + ".class"), split[split.length - 1] + ".class", fun);
     }
-
+    /**
+     * 解析摸个class文件
+     * @param clazz class文件
+     * @param fun 当前调用方法是否需要统计
+     * @return
+     * @throws Exception
+     */
     public static ClassInfo parseClass(Class clazz, Function<String, Boolean> fun) throws Exception {
         String filePath = clazz.getName().replace(".", "/") + ".class";
         String fileName = clazz.getSimpleName() + ".class";
         return parseClass(ClassInfoUtil.class.getResourceAsStream("/" + filePath), fileName, fun);
     }
 
+    /**
+     *
+     * @param in class文件输入流
+     * @param fileName 文件名称
+     * @param fun 当前调用方法是否需要统计
+     * @return
+     * @throws Exception
+     */
     public static ClassInfo parseClass(InputStream in, String fileName, Function<String, Boolean> fun) throws Exception {
         ClassParser classParser = new ClassParser(in, fileName);
         JavaClass parse = classParser.parse();
@@ -137,6 +158,14 @@ public class ClassInfoUtil {
         });
         return methodInfos;
     }
+
+    /**
+     * 解析某个class文件，找出class含有的方法及方法内部调用的子方法。
+     * @param className
+     * @param fun 调用方法过滤规则
+     * @return
+     * @throws Exception
+     */
     public static List<MethodInfo> getMethodChain(String className,Function<String, Boolean> fun) throws Exception {
         return getMethodChain(className,fun,e->{
             String[] split = e.split("\\.");
@@ -145,7 +174,15 @@ public class ClassInfoUtil {
         });
     }
 
-    public static List<MethodInfo> getMethod(MethodInfo methodInfo, Function<String, Boolean> fun, Function<String, String> implFun, Set<MethodInfo> set) {
+    /**
+     *
+     * @param methodInfo 某个方法
+     * @param fun 调用方法过滤规则
+     * @param implFun 针对接口找到实现类的方法
+     * @param set
+     * @return
+     */
+    private static List<MethodInfo> getMethod(MethodInfo methodInfo, Function<String, Boolean> fun, Function<String, String> implFun, Set<MethodInfo> set) {
         if(methodInfo == null){
             return null;
         }
@@ -183,7 +220,9 @@ public class ClassInfoUtil {
         }
 
         for (MethodInfo method : resultMethod.getNextCalls()) {
-            set.add(method);
+            if(!set.add(method)){
+                continue;
+            }
             method.setNextCalls(getMethod(method,fun,implFun, set));
             set.remove(method);
         }
