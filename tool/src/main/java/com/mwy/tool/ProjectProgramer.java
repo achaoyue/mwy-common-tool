@@ -14,19 +14,19 @@ import java.util.function.Function;
 public class ProjectProgramer {
 
 
-    public static String getProgramer(String bathPath, Function<String, Boolean> fun){
-        List<String> classNames = DirUtil.getFileList(bathPath, ".*/src/main/java/.*\\.java", e->{
+    public static String getProgramer(String bathPath, Function<String, Boolean> fun) {
+        List<String> classNames = DirUtil.getFileList(bathPath, ".*/src/main/java/.*\\.java", e -> {
             String[] split = e.split("/src/main/java/");
-            if(split!= null && split.length > 1){
-                return  split[1].replace(".java","").replace("/",".");
-            }else {
+            if (split != null && split.length > 1) {
+                return split[1].replace(".java", "").replace("/", ".");
+            } else {
                 return "";
             }
         });
         ClassContext classContext = ClassContext.getInstance();
         for (String className : classNames) {
             try {
-                if(classContext.containsKey(className)){
+                if (classContext.containsKey(className)) {
                     continue;
                 }
                 ClassInfoUtil.getMethodChain(className, fun);
@@ -34,27 +34,41 @@ public class ProjectProgramer {
                 e.printStackTrace();
             }
         }
-        List<Node> nodes = new ArrayList<>();
-        List<Edge> edges = new ArrayList<>();
-        for (String className : classContext.keySet()) {
-            nodes.add(new Node(className));
+
+        Set<Node> nodes = new HashSet<>();
+        Set<Edge> edges = new HashSet<>();
+        for (String className : classNames) {
             ClassInfo classInfo = classContext.get(className);
+            if (classInfo == null) {
+                continue;
+            }
+            if(!fun.apply(className)){
+                continue;
+            }
             List<MethodInfo> methodInfos = classInfo.getMethodInfos();
-            if(!CollectionUtils.isEmpty(methodInfos)){
+            if (!CollectionUtils.isEmpty(methodInfos)) {
                 for (MethodInfo method : methodInfos) {
-                    if(Objects.equals(className,method.getClassName()) && !method.getClassName().contains("$")){
+                    List<MethodInfo> nextCalls = method.getNextCalls();
+                    if (CollectionUtils.isEmpty(nextCalls)) {
                         continue;
                     }
-                    Edge edge = new Edge();
-                    edge.setSource(className);
-                    edge.setTarget(method.getClassName());
-                    edges.add(edge);
+                    for (MethodInfo child : nextCalls) {
+                        if (Objects.equals(className, child.getClassName()) || method.getClassName().contains("$")) {
+                            continue;
+                        }
+                        nodes.add(new Node(className.replace(".","-")));
+                        nodes.add(new Node(child.getClassName().replace(".","-")));
+                        Edge edge = new Edge();
+                        edge.setSource(className.replace(".","-"));
+                        edge.setTarget(child.getClassName().replace(".","-"));
+                        edges.add(edge);
+                    }
                 }
             }
         }
-        Map<String,Object> map = new HashMap<>();
-        map.put("nodes",nodes);
-        map.put("edges",edges);
+        Map<String, Object> map = new HashMap<>();
+        map.put("nodes", nodes);
+        map.put("edges", edges);
         return JSON.toJSONString(map);
     }
 
@@ -68,17 +82,17 @@ public class ProjectProgramer {
     }
 
 
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    private static class Node {
+        private String id;
+    }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    private static class Node{
-        private String name;
-    }
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    private static class Edge{
+    private static class Edge {
         private String source;
         private String target;
         private String label;
