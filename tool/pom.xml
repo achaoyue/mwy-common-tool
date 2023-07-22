@@ -9,7 +9,7 @@
     <artifactId>tool</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <properties>
-        <spring.version>4.3.18.RELEASE</spring.version>
+        <spring.version>5.2.24.RELEASE</spring.version>
     </properties>
     <build>
         <plugins>
